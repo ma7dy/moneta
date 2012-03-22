@@ -12,10 +12,12 @@ module Moneta
 
     def initialize(options={})
       file = @file = options[:file]
+      password = options[:password]
       @db = Bdb::Db.new()
-      @db.open(nil, file, nil, Bdb::Db::BTREE, Bdb::DB_CREATE, 0)
+      @db.encrypt = password if password != nil
+      @db.open(nil, file, nil, Bdb::Db::HASH, Bdb::DB_CREATE, 0)
       unless options[:skip_expires]
-        @expiration = Moneta::Berkeley.new(:file => "#{file}_expiration", :skip_expires => true )
+        @expiration = Moneta::Berkeley.new(:file => "#{file}_expiration", :skip_expires => true, :password => password )
         self.extend(StringExpires)
       end
     end
